@@ -32,3 +32,6 @@ int main(int argc, char *argv[]) {
     freearguments(); // free memory allocated by parseargs()
     return 0;
 }
+
+// For example, run:
+// gcc -Wall -o program example.c && ./program --ipv4 --ttl=10 192.168.1.1 443 --ipv6
