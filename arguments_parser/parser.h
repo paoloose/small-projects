@@ -1,6 +1,5 @@
 #pragma once
 #include <stdbool.h> // bool type
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,63 +13,39 @@ struct argument {
     char* value;
 };
 
-bool startswith(char* str, char* prefix) {
-    size_t prefix_len = strlen(prefix);
-    char* buff = malloc(prefix_len + 1);
-    memcpy(buff, str, prefix_len);
-    buff[prefix_len] = '\0';
+// ----------------- Functions -----------------
+// string operations
+static bool startswith(char* str, char* prefix);
+static bool contains(char* str, char* substr);
+static int charpos(char* str, char tofind);
+// strdup implementations
+static char* _strdup (const char* str);
+static char* _strndup(const char* start, size_t n_bytes);
 
-    bool result = strcmp(prefix, buff) == 0;
-    free(buff);
-    return result;
-}
+#ifndef MAX_FLAGS
+#   define MAX_FLAGS 8
+#endif
+#ifndef MAX_ARGS
+#   define MAX_ARGS 8
+#endif
 
-bool contains(char* str, char* substr) {
-    return strstr(str, substr) != NULL;
-}
-
-int charpos(char* str, char tofind) {
-    return strchr(str, tofind) - str;
-}
-
-// strdup implementation
-char* _strdup (const char* str) {
-    size_t len = strlen(str);
-    char* allocated = malloc(len + 1);
-
-    if (!allocated) return NULL;
-    strcpy(allocated, str);
-
-    return allocated;
-}
-
-char* _strndup(const char* start, size_t n_bytes) {
-    if (n_bytes > strlen(start)) {
-        fprintf(
-            stderr,
-            "fatal error: at my_strdup(), attempt to %ld bytes from string '%s'\n",
-            n_bytes, start
-        );
-        exit(-1);
-    }
-    char* copy = malloc(n_bytes + 1);
-    if (!copy) return NULL;
-
-    memcpy(copy, start, n_bytes);
-    copy[n_bytes] = '\0';
-    return copy;
-}
-
-#define MAX_FLAGS 8
-#define MAX_ARGS 8
-
-// array of flags
+// ----------------- Global variables -----------------
 struct flag g_program_flags[MAX_FLAGS];
 struct flag g_program_args[MAX_ARGS];
 int g_nprogram_flags = 0;
 int g_nprogram_args = 0;
 
-int parseargs(char* usage, int argc, char *argv[]) {
+// ----------------- Definitions -----------------
+
+/*
+Parses and validates arguments.
+Must be called before using `getarg()` or `isflagset()`.
+
+When a parsing error occurs, the program exits with a nice error message and the 'Usage:' information.
+
+Also, `freearguments()` must be called to free memory allocated by this function.
+*/
+void parseargs(char* usage, int argc, char *argv[]) {
     if (argc == 1) {
         fprintf(stderr, "Usage: %s\n", usage);
         exit(-1);
@@ -145,7 +120,7 @@ int parseargs(char* usage, int argc, char *argv[]) {
                     fprintf(stderr, "malformed flag '%s'\n", current_arg);
                     fprintf(stderr, "Usage: %s\n", usage);
                     exit(-1);
-                    return -1;
+                    return;
                 }
                 char* flag_name;
                 char* flag_value;
@@ -187,20 +162,20 @@ int parseargs(char* usage, int argc, char *argv[]) {
                 fprintf(stderr, "received unexpected flag '%s'\n", curr_flag->name);
                 fprintf(stderr, "Usage: %s\n", usage);
                 exit(-1);
-                return -1;
+                return;
             }
             if (!flag_valid) {
                 // printf("value=%s, boolean=%d\n", curr_flag->value, curr_flag->boolean_flag);
                 fprintf(
                     stderr,
                     curr_flag->value != NULL && matched_flag->boolean_flag
-                        ? "flag '%s' does not expect a value"
-                        : "flag '%s' expects a value",
+                        ? "flag '%s' does not expect a value\n"
+                        : "flag '%s' expects a value\n",
                     curr_flag->name
                 );
                 fprintf(stderr, "Usage: %s\n", usage);
                 exit(-1);
-                return -1;
+                return;
             }
             // printf("received valid flag: %s", curr_flag->name);
             if (!g_program_flags[nflags_received].boolean_flag) {
@@ -246,10 +221,16 @@ int parseargs(char* usage, int argc, char *argv[]) {
     // save number of flags received
     g_nprogram_args = nargs_received;
     g_nprogram_flags = nflags_received;
-
-    return 1;
 }
 
+/*
+When called with a non-boolean flag name, it returns the value of the flag.
+If the flag is a boolean flag, use `isflagset()` instead (this will throw an error).
+
+When called with an argument name, it returns the value of the argument.
+
+If the flag or argument doesn't exist, returns NULL.
+*/
 char* getarg(char* arg_name) {
     // get argument value
     if (startswith(arg_name, "<")) {
@@ -269,7 +250,7 @@ char* getarg(char* arg_name) {
                     // If it's a boolean flag, it doesn't have a value
                     fprintf(
                         stderr,
-                        "fatal error: attempt to get value of boolean flag %s", arg_name
+                        "fatal error: attempt to get value of boolean flag '%s'\n", arg_name
                     );
                     exit(-1);
                     return NULL;
@@ -290,6 +271,10 @@ char* getarg(char* arg_name) {
     return NULL;
 }
 
+/*
+Returns true if the flag is set, false otherwise (bool defined in <stdbool.h>).
+Works for both boolean and non-boolean flags.
+*/
 bool isflagset(char* flag_name) {
     // get boolean flag value
     for (int i = 0; i < g_nprogram_flags; i++) {
@@ -303,6 +288,10 @@ bool isflagset(char* flag_name) {
     return false;
 }
 
+/*
+Free memory allocated in global variables by `parseargs()`.
+After calling this function you will not be able to use `getarg()` or `isflagset()`.
+*/
 void freearguments() {
     for (int i = 0; i < g_nprogram_flags; i++) {
         free(g_program_flags[i].name);
@@ -310,4 +299,50 @@ void freearguments() {
     for (int i = 0; i < g_nprogram_args; i++) {
         free(g_program_args[i].name);
     }
+}
+
+static bool startswith(char* str, char* prefix) {
+    size_t prefix_len = strlen(prefix);
+    char* buff = malloc(prefix_len + 1);
+    memcpy(buff, str, prefix_len);
+    buff[prefix_len] = '\0';
+
+    bool result = strcmp(prefix, buff) == 0;
+    free(buff);
+    return result;
+}
+
+static char* _strndup(const char* start, size_t n_bytes) {
+    if (n_bytes > strlen(start)) {
+        fprintf(
+            stderr,
+            "fatal error: at my_strdup(), attempt to %ld bytes from string '%s'\n",
+            n_bytes, start
+        );
+        exit(-1);
+    }
+    char* copy = malloc(n_bytes + 1);
+    if (!copy) return NULL;
+
+    memcpy(copy, start, n_bytes);
+    copy[n_bytes] = '\0';
+    return copy;
+}
+
+static char* _strdup (const char* str) {
+    size_t len = strlen(str);
+    char* allocated = malloc(len + 1);
+
+    if (!allocated) return NULL;
+    strcpy(allocated, str);
+
+    return allocated;
+}
+
+static int charpos(char* str, char tofind) {
+    return strchr(str, tofind) - str;
+}
+
+static bool contains(char* str, char* substr) {
+    return strstr(str, substr) != NULL;
 }
