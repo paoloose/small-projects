@@ -18,10 +18,10 @@ Just include the `parser.h` and you are ready to go.
 
 // Define usage string for your program.
 // Example with a ping program:
-char ping_usage[] = "my_program --ipv4 --ipv6 --ttl=TTL <host> <port>";
+char usage[] = "my_program --ipv4 --ipv6 --ttl=TTL <host> <port>";
 
 int main(int argc, char *argv[]) {
-    usage(ping_usage, argc, argv); // load arguments and check if they are valid
+    parseargs(usage, argc, argv); // load arguments and check if they are valid
 
     // all arguments are validated and loaded
 
@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
     getarg("--non-existing"); // returns NULL
     isflagset("--non-existing"); // returns false (0)
 
+    freearguments(); // free memory
     return 0;
 }
 ```

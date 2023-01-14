@@ -84,7 +84,7 @@ struct flag g_program_args[MAX_ARGS];
 int g_nprogram_flags = 0;
 int g_nprogram_args = 0;
 
-int usage(char* usage, int argc, char *argv[]) {
+int parseargs(char* usage, int argc, char *argv[]) {
     if (argc == 1) {
         fprintf(stderr, "Usage: %s\n", usage);
         exit(-1);
@@ -313,4 +313,13 @@ bool isflagset(char* flag_name) {
         }
     }
     return false;
+}
+
+void freearguments() {
+    for (int i = 0; i < g_nprogram_flags; i++) {
+        free(g_program_flags[i].name);
+    }
+    for (int i = 0; i < g_nprogram_args; i++) {
+        free(g_program_args[i].name);
+    }
 }

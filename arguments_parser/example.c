@@ -2,16 +2,16 @@
 #include <string.h>
 #include "parser.h"
 
-char ping_usage[] = "my_program --ipv4 --ipv6 --ttl=TTL <host> <port>";
+char usage[] = "my_program --ipv4 --ipv6 --ttl=TTL <host> <port>";
 
 int main(int argc, char *argv[]) {
-    usage(ping_usage, argc, argv);
+    parseargs(usage, argc, argv);
 
     char* host = getarg("<host>");
     char* port = getarg("<port>");
 
-    printf("get <host>: %s\n", host);
-    printf("get <port>: %s\n", port);
+    printf("argument: <host>: %s\n", host);
+    printf("argument: <port>: %s\n", port);
 
     if (isflagset("--ipv4")) {
         printf("--ipv4 flag is set\n");
@@ -26,5 +26,6 @@ int main(int argc, char *argv[]) {
     getarg("--non-existing"); // returns NULL
     isflagset("--non-existing"); // returns false (0)
 
+    freearguments(); // free memory allocated by parseargs()
     return 0;
 }
