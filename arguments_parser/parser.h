@@ -14,20 +14,6 @@ struct argument {
     char* value;
 };
 
-void print_binary(const char* str) {
-    int i;
-    for (i = 0; ; i++) {
-        for (int j = 7; j >= 0; j--) {
-            putchar((str[i] & (1 << j)) ? '1' : '0');
-        }
-        if (str[i] == '\0') {
-            break;
-        }
-        putchar(' ');
-    }
-    putchar('\n');
-}
-
 bool startswith(char* str, char* prefix) {
     size_t prefix_len = strlen(prefix);
     char* buff = malloc(prefix_len + 1);
