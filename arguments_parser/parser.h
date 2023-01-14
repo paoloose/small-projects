@@ -48,7 +48,7 @@ char* _strndup(const char* start, size_t n_bytes) {
     if (n_bytes > strlen(start)) {
         fprintf(
             stderr,
-            "error: at my_strdup(), attempt to %ld bytes from string '%s'\n",
+            "fatal error: at my_strdup(), attempt to %ld bytes from string '%s'\n",
             n_bytes, start
         );
         exit(-1);
@@ -142,11 +142,8 @@ int parseargs(char* usage, int argc, char *argv[]) {
             if (contains(current_arg, "=")) {
                 int pos = charpos(current_arg, '=');
                 if (pos < 2 || pos == strlen(current_arg) - 1) {
-                    fprintf(
-                        stderr,
-                        "error: malformed flag: '%s'\n",
-                        current_arg
-                    );
+                    fprintf(stderr, "malformed flag '%s'\n", current_arg);
+                    fprintf(stderr, "Usage: %s\n", usage);
                     exit(-1);
                     return -1;
                 }
@@ -187,23 +184,23 @@ int parseargs(char* usage, int argc, char *argv[]) {
                 }
             }
             if (!flag_exists) {
-                fprintf(
-                    stderr,
-                    "error: received unexpected flag: '%s'\n",
-                    curr_flag->name
-                );
+                fprintf(stderr, "received unexpected flag '%s'\n", curr_flag->name);
+                fprintf(stderr, "Usage: %s\n", usage);
                 exit(-1);
+                return -1;
             }
             if (!flag_valid) {
                 // printf("value=%s, boolean=%d\n", curr_flag->value, curr_flag->boolean_flag);
                 fprintf(
                     stderr,
                     curr_flag->value != NULL && matched_flag->boolean_flag
-                        ? "error: flag '%s' does not expect a value\n"
-                        : "error: flag '%s' expects a value\n",
+                        ? "flag '%s' does not expect a value"
+                        : "flag '%s' expects a value",
                     curr_flag->name
                 );
+                fprintf(stderr, "Usage: %s\n", usage);
                 exit(-1);
+                return -1;
             }
             // printf("received valid flag: %s", curr_flag->name);
             if (!g_program_flags[nflags_received].boolean_flag) {
@@ -246,6 +243,7 @@ int parseargs(char* usage, int argc, char *argv[]) {
         fprintf(stderr, "Usage: %s\n", usage);
         exit(-1);
     }
+    // save number of flags received
     g_nprogram_args = nargs_received;
     g_nprogram_flags = nflags_received;
 
@@ -271,7 +269,7 @@ char* getarg(char* arg_name) {
                     // If it's a boolean flag, it doesn't have a value
                     fprintf(
                         stderr,
-                        "getarg: attempt to get value of boolean flag %s", arg_name
+                        "fatal error: attempt to get value of boolean flag %s", arg_name
                     );
                     exit(-1);
                     return NULL;
@@ -282,15 +280,19 @@ char* getarg(char* arg_name) {
         return NULL;
     }
     else {
-        fprintf(stderr, "error: bad argument name: %s\n", arg_name); // CUSTOMIZE ERROR MESSAGE
-        exit(-1); // ERROR MESSAGE
+        fprintf(
+            stderr,
+            "fatal error: in getarg(\"%s\")\nargument name must start with '-' or '<'\n",
+            arg_name
+        );
+        exit(-1);
     }
     return NULL;
 }
 
 bool isflagset(char* flag_name) {
     // get boolean flag value
-    for (int i = 0; i < MAX_FLAGS; i++) {
+    for (int i = 0; i < g_nprogram_flags; i++) {
         // printf("checking %s", g_program_flags[i].name);
         if (!g_program_flags[i].name) return false;
         // printf("comparing %s to %s\n", program_flags[i].name, flag_name);
