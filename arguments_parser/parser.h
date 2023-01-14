@@ -158,7 +158,7 @@ int usage(char* usage, int argc, char *argv[]) {
                 if (pos < 2 || pos == strlen(current_arg) - 1) {
                     fprintf(
                         stderr,
-                        "error: malformed Usage definition with token '=' at '%s'\n",
+                        "error: malformed flag: '%s'\n",
                         current_arg
                     );
                     exit(-1);
@@ -203,7 +203,7 @@ int usage(char* usage, int argc, char *argv[]) {
             if (!flag_exists) {
                 fprintf(
                     stderr,
-                    "error: received unknown flag: %s\n",
+                    "error: received unexpected flag: '%s'\n",
                     curr_flag->name
                 );
                 exit(-1);
