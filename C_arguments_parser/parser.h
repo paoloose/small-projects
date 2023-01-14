@@ -50,7 +50,7 @@ void parseargs(char* usage, int argc, char *argv[]) {
         fprintf(stderr, "Usage: %s\n", usage);
         exit(-1);
     }
-    // --- Usage information
+    // --- To store accepted flags and arguments ---
     struct defined_flag {
         char* name;
         bool boolean_flag;
@@ -60,12 +60,14 @@ void parseargs(char* usage, int argc, char *argv[]) {
     char* required_args[MAX_FLAGS]; // also
     int nargs_required = 0;
 
-    // --- Parsing usage
+    /* --- Parsing Usage string --- */
 	char delim[] = " ";
 
-    char* usage_cpy = _strdup(usage); // freed
+    char* usage_cpy = _strdup(usage); // because strtok() modifies the string
 	char *current = strtok(usage_cpy, delim); // first token
-    // looping through all the tokens
+
+    // Looping through all the tokens in Usage for saving defined flags and arguments
+    // Note that no hard validation is done here, just saving the information
 	while ((current = strtok(NULL, delim)) != NULL) {
         // flags
         if (startswith(current, "-")) {
@@ -88,22 +90,15 @@ void parseargs(char* usage, int argc, char *argv[]) {
         }
         // arguments
         else if (startswith(current, "<")) {
-            // printf("arg = %s\n", current);
             required_args[nargs_required] = _strdup(current);
             nargs_required++;
         }
+        else {
+            fprintf(stderr, "fatal error: malformed Usage definition in '%s'.\n", current);
+            exit(-1);
+        }
 	}
     free(usage_cpy);
-
-    // --- Debugging
-    // print accepted flags
-    for (int i = 0; i < nflags; i++) {
-        // printf(" > accepted flag = '%s'\n", accepted_flags[i].name);
-    }
-    // print required args
-    for (int i = 0; i < nargs_required; i++) {
-        // printf(" > required arg = '%s'\n", required_args[i]);
-    }
 
     /* --- Parsing received arguments in char* argv[] --- */
     int nflags_received = 0;
@@ -115,6 +110,7 @@ void parseargs(char* usage, int argc, char *argv[]) {
         if (startswith(current_arg, "-")) {
             // check if it's a 'boolean flag' or 'value flag'
             if (contains(current_arg, "=")) {
+                // Need to split the flag name and flag value received
                 int pos = charpos(current_arg, '=');
                 if (pos < 2 || pos == strlen(current_arg) - 1) {
                     fprintf(stderr, "malformed flag '%s'\n", current_arg);
@@ -131,7 +127,6 @@ void parseargs(char* usage, int argc, char *argv[]) {
                     strlen(current_arg) - (pos + 1)
                 ); // copy flag value
 
-                // printf("\nsaving name=%s value=%s\n\n", flag_name, flag_value);
                 // save values.
                 // (note that are memory allocated that will be freed at the end)
                 g_program_flags[nflags_received].name = flag_name;
@@ -140,7 +135,7 @@ void parseargs(char* usage, int argc, char *argv[]) {
             }
             else {
                 g_program_flags[nflags_received].name = _strdup(current_arg);
-                g_program_flags[nflags_received].value = NULL; // boolean flag
+                g_program_flags[nflags_received].value = NULL; // is boolean flag
                 g_program_flags[nflags_received].boolean_flag = true;
             }
             // check if flag exists in Usage definition
@@ -148,6 +143,7 @@ void parseargs(char* usage, int argc, char *argv[]) {
             bool flag_valid  = false;
             struct flag* curr_flag = &g_program_flags[nflags_received];
             struct defined_flag* matched_flag = NULL;
+            // looping through accepted flags
             for (int i = 0; i < nflags; i++) {
                 if (strcmp(accepted_flags[i].name, curr_flag->name) == 0) {
                     flag_exists = true;
@@ -165,7 +161,6 @@ void parseargs(char* usage, int argc, char *argv[]) {
                 return;
             }
             if (!flag_valid) {
-                // printf("value=%s, boolean=%d\n", curr_flag->value, curr_flag->boolean_flag);
                 fprintf(
                     stderr,
                     curr_flag->value != NULL && matched_flag->boolean_flag
@@ -177,14 +172,10 @@ void parseargs(char* usage, int argc, char *argv[]) {
                 exit(-1);
                 return;
             }
-            // printf("received valid flag: %s", curr_flag->name);
-            if (!g_program_flags[nflags_received].boolean_flag) {
-                // printf(" / value=%s", g_program_flags[nflags_received].value);
-            }
-            // putchar('\n');
             nflags_received++;
         }
-        // is an <argument>
+        // is an argument
+        // note that arguments are received in the same order as in Usage
         else {
             if (nargs_received >= nargs_required) {
                 fprintf(
@@ -194,7 +185,6 @@ void parseargs(char* usage, int argc, char *argv[]) {
                 fprintf(stderr, "Usage: %s\n", usage);
                 exit(-1);
             }
-            // printf("received arg %s = %s\n", required_args[nargs_received], current_arg);
             g_program_args[nargs_received].name = _strdup(required_args[nargs_received]);
             g_program_args[nargs_received].value = _strdup(current_arg);
             nargs_received++;
@@ -278,9 +268,6 @@ Works for both boolean and non-boolean flags.
 bool isflagset(char* flag_name) {
     // get boolean flag value
     for (int i = 0; i < g_nprogram_flags; i++) {
-        // printf("checking %s", g_program_flags[i].name);
-        if (!g_program_flags[i].name) return false;
-        // printf("comparing %s to %s\n", program_flags[i].name, flag_name);
         if (strcmp(g_program_flags[i].name, flag_name) == 0) {
             return true;
         }
