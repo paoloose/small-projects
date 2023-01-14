@@ -9,14 +9,14 @@ Simple C argument parser for simple C programs.
 
 This argument parser is designed to be used in simple C CLI programs.
 
-Just include the `parser.h` and you are ready to go.
+Just include the `argsparser.h` and you are ready to go.
 
 Define your flags and arguments just with a single string!!.
 
 ```c
 #include <stdio.h>
 #include <string.h>
-#include "parser.h"
+#include "argsparser.h"
 
 // Define usage string for your program.
 // Example with a ping program:
