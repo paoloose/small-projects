@@ -1,17 +1,23 @@
 
 # C argument parser
 
-Dummy _weekend_ projects
-Simple C argument parser for simple C programs.
+Dummy _weekend_ projects.
 
-Example:
+`Usage`: Simple C argument parser for simple C programs.
+
+## Usage
+
+This argument parser is designed to be used in simple C CLI programs.
+
+Just include the `parser.h` and you are ready to go.
 
 ```c
 #include <stdio.h>
 #include <string.h>
 #include "parser.h"
 
-// Define usage string
+// Define usage string for your program.
+// Example with a ping program:
 char ping_usage[] = "my_program --ipv4 --ipv6 --ttl=TTL <host> <port>";
 
 int main(int argc, char *argv[]) {
@@ -40,3 +46,47 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 ```
+
+Now you can compile and run your program with your defined arguments.
+
+We handle the following cases:
+
+```bash
+gcc -o my_program my_program.c
+
+# Valid cases
+
+./my_program --ipv4 --ttl=10 google.com 80 # valid
+./my_program google.com 80 # no flags, valid
+./my_program --ipv4 --ipv6 google.com 80 # semantically invalid, but valid
+
+# Invalid cases
+
+./my_program --ipv4 --ttl=10 google.com 80 443
+# error: only 2 arguments expected
+
+./my_program --ipv4 --ttl=10 google.com
+# error: received 1 arguments, expected 2
+
+./my_program --ipv4 --ttl= google.com 80
+# error: malformed flag: '--ttl='
+
+./my_program --ipv4=true google.com 443
+# error: flag '--ipv4' does not expect a value
+
+./my_program --ttl google.com 80 --ipv6
+# error: flag '--ttl' expects a value
+
+./my_program --ipv4 --verbose google.com 80
+# error: received unexpected flag: '--verbose'
+```
+
+Yes, we handle errors for you and print them to `stderr`.
+
+## Limitations
+
+- All flags are **optional** by default and by design.
+- All arguments are **required** by default and by design.
+- Complex syntax like required flags or optional arguments are not supported.
+
+Features may be added in the future as needed.
