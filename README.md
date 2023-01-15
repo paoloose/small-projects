@@ -4,6 +4,7 @@ Dummy _weekend_ projects
 
 **Work in progress**:
 
-- C argumet parser
-
 **Done**:
+
+- C argumet parser
+- ICMP echo requests
