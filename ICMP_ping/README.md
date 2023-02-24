@@ -1,6 +1,6 @@
 # Ping implementations
 
-ICMP echo requests (ping) implementations in various languages.
+ICMP echo request (ping) implementation in C.
 
 Code is commented for educational purposes, take a look at the code to
 understand how it works ✨ (basic understanding of networking is required).
@@ -37,8 +37,7 @@ sudo ./ping 8.8.8.8
 
 ## Please note
 
-- Raw sockets are used in this implementations, this feature **requires root
-  privileges**.
+- Raw sockets are used in this implementations, this feature **requires root privileges**.
 - There are other types of "pings", like TCP ping, UDP ping, etc. This repo
   focuses only on ICMP echo requests.
 - ICMP packets can be blocked by firewalls, take this into account when
@@ -54,8 +53,8 @@ sudo ./ping 8.8.8.8
 
 - Implementations are not intended to be CLI tools, but rather examples of
   how to implement ICMP protocol for pinging hosts.
-- IPv4 support only (yet).
-- No DNS support (yet).
+- IPv4 support only.
+- No DNS support.
 
 ## References
 
