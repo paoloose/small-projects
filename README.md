@@ -2,11 +2,5 @@
 
 Dummy _weekend_ projects
 
-**Work in progress**:
-
-- `cat` command in Rust
-
-**Done**:
-
-- C argumet parser
-- ICMP echo requests
+You are free to use the code in any way you want. Some projects are
+documented to serve as future reference for others or myself.
