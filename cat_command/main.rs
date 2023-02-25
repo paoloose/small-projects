@@ -9,6 +9,16 @@ fn main() {
     let mut args = env::args().peekable();
     let _ = args.next(); // Skip program name
 
+    // From `man cat`:
+    // "With no FILE, or when FILE is -, read standard input."
+    if args.peek().is_none() || args.peek().unwrap() == "-" {
+        let stdin_handle = std::io::stdin();
+
+        stdin_handle.bytes().for_each(|b| {
+            print!("{}", b.unwrap() as char);
+        });
+    }
+
     args.for_each(|path_name| {
         let file = Path::new(&path_name);
 
@@ -18,7 +28,7 @@ fn main() {
             return;
         }
         if !file.is_file() {
-            println!("cat: {}: Is a directory", path_name);
+            println!("cat: {}: Is not a file", path_name);
             return;
         }
 
