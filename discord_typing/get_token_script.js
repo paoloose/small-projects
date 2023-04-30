@@ -21,7 +21,7 @@ const user_id = getFromStorage('user_id_cache');
 const tokens = getFromStorage('tokens');
 
 if (!tokens) console.log('Please log into your Discord account 🐢');
-if (!user_id && tokens)  console.log(tokens ?? 'Failed to get token, please re login 🐢');
-if (user_id && tokens)   console.log(tokens[user_id]);
+if (!user_id && tokens) console.log(tokens ?? 'Failed to get token, please re login 🐢');
+if (user_id && tokens)  console.log(tokens[user_id]);
 }());
 // ==== End copy ====
