@@ -1,0 +1,15 @@
+{
+  "name": "infinite-typing",
+  "version": "1.0.0",
+  "description": "Infinite typing animation for Discord",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./main.js"
+  },
+  "dependencies": {
+    "password-prompt": "^1.1.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
