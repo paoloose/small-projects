@@ -6,8 +6,8 @@ const TYPING_ENDPOINT = (channel_id) => `https://discord.com/api/v9/channels/${c
 const INTERVAL_DELAY = 4000;
 
 // You can hardcode your token and channel_id here ⤵
-const TOKEN = '';
-const CHANNEL_ID = '';
+const TOKEN = process.argv[2] || '';
+const CHANNEL_ID = process.argv[3] || '';
 
 async function ask(question) {
   try {
