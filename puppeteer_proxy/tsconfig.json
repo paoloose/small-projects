@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "noPropertyAccessFromIndexSignature": true,
+        "strict": true,
+        "allowSyntheticDefaultImports": true,
+        "target": "es2021"
+    },
+    "exclude": ["node_modules", "dist"]
+}
