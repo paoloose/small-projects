@@ -1,10 +1,13 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { browser } from './browser';
+import { cors } from './cors';
 
 dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT) | 8080;
+
+app.use(cors);
 
 app.get('/browse', async (req, res) => {
   const { url } = req.query;
