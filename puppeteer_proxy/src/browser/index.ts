@@ -17,9 +17,14 @@ class HeadlessBrowser {
     await page.setViewport(browserConfig.viewport);
     await page.setRequestInterception(true);
 
+    // Block resources for faster page load
     page.on('request', request => {
-      if (request.resourceType() === 'image') request.abort();
-      else request.continue();
+      if (this.config.blockedResourceTypes.includes(request.resourceType())) {
+        request.abort();
+      }
+      else {
+        request.continue();
+      }
     });
 
     return page;

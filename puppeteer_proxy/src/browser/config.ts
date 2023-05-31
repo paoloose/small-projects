@@ -10,5 +10,12 @@ export const browserConfig: HeadlessBrowserConfig = {
     args: [
       '--force-dark-mode',
     ]
-  }
+  },
+  blockedResourceTypes: [
+    'image',
+    'media',
+    'font',
+    'texttrack',
+    'cspviolationreport'
+  ],
 };
