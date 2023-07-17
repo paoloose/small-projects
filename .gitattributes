@@ -1,3 +1,2 @@
 gl.c linguist-vendored
-.c linguist-vendored
-include/glad/* linguist-vendored
+glad/** linguist-vendored
