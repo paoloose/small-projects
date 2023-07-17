@@ -1,0 +1,3 @@
+gl.c linguist-vendored
+.c linguist-vendored
+include/glad/* linguist-vendored
