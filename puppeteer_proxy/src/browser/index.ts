@@ -15,7 +15,7 @@ class HeadlessBrowser {
     const browser = await this.browser;
     const page = await browser.newPage();
     await page.setViewport(browserConfig.viewport);
-    await page.setRequestInterception(true);
+    /*await page.setRequestInterception(true);
 
     // Block resources for faster page load
     page.on('request', request => {
@@ -25,7 +25,7 @@ class HeadlessBrowser {
       else {
         request.continue();
       }
-    });
+    });*/
 
     return page;
   }

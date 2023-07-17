@@ -11,11 +11,12 @@ export const browserConfig: HeadlessBrowserConfig = {
       '--force-dark-mode',
     ]
   },
-  blockedResourceTypes: [
+  blockedResourceTypes: []
+  /*blockedResourceTypes: [
     'image',
     'media',
     'font',
     'texttrack',
     'cspviolationreport'
-  ],
+  ],*/
 };
