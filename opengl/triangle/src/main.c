@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "shaders.h"
+#include "utils.h"
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void error_callback(int error, const char* description);
@@ -15,10 +16,8 @@ int main(void) {
 
     /* Create a windowed mode window and its OpenGL context */
     GLFWwindow* window = glfwCreateWindow(640, 480, "floating", NULL, NULL);
-    if (!window) {
-        glfwTerminate();
-        return -1;
-    }
+    APP_ASSERT(window != NULL, "Failed to create GLFW window");
+
     glfwSetKeyCallback(window, key_callback);
 
     /* Make the window's context current */
@@ -31,11 +30,7 @@ int main(void) {
         to all such libraries.
     */
     int version = gladLoadGL(glfwGetProcAddress);
-    if (version == 0) {
-        printf("Failed to initialize OpenGL context\n");
-        return -1;
-    }
-
+    APP_ASSERT(version != 0, "Failed to initialize OpenGL context");
     printf("OpenGL version: %s\n", glGetString(GL_VERSION));
     printf("glad %d.%d\n", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 
@@ -72,31 +67,8 @@ int main(void) {
           //          For serious cases, you should use offsetof(struct, property)
     );
 
-    char* vertexShader =
-        "#version 330 core\n"
-        "\n"
-        "layout (location = 0) in vec2 position;\n"
-        "\n"
-        "void main() {\n"
-        // gl_Position expects a vec4, so you have to cast it implicity (up) or explicitly (here)
-        "   gl_Position = vec4(position.x, position.y, 0.0, 1.0);\n"
-        "}";
-
-    char* fragmentShader =
-        "#version 330 core\n"
-        "\n"
-        "layout (location = 0) out vec4 color;\n"
-        "\n"
-        "void main() {\n"
-        // gl_Position expects a vec4, so you have to cast it implicity (up) or explicitly (here)
-        "   color = vec4(0.57, 0.50, 0.74, 1.0);\n"
-        "}";
-
-    GLuint program = CreateShader(vertexShader, fragmentShader);
-    if (program == GL_FALSE) {
-        glfwTerminate();
-        return -1;
-    }
+    GLuint program = LoadShader("./resources/basic.shader");
+    APP_ASSERT(program != GL_FALSE, "Failed to create shader program");
     glUseProgram(program);
 
     // Go to the next '🐢' to see the drawing
@@ -124,11 +96,14 @@ int main(void) {
 }
 
 void error_callback(int error, const char* description) {
+    (void)error;
     fprintf(stderr, "Error 🤭: %s\n", description);
 }
 
 // Is called whenever a key is pressed/released via GLFW
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
+    (void)scancode;
+    (void)mode;
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }

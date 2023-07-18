@@ -10,7 +10,8 @@ bin_name="program"
 
 files="$(find $src_dir -name '*.c')"
 # replace glfw with lraylib
-cflags="-Werror -Wextra -pedantic"
+mode=$(if [ "$1" = "debug" ]; then echo "-g3 -DDEBUG"; else echo ""; fi)
+cflags="-Wall -Werror -Wextra -pedantic $mode"
 libs="-lglfw -lGL -lm -lpthread -ldl -lrt -lX11"
 includes="-I./include"
 
