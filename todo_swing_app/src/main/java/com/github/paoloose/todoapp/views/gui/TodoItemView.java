@@ -1,11 +1,15 @@
-package com.github.paoloose.todoapp;
+package com.github.paoloose.todoapp.views.gui;
+import javax.swing.JFrame;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 
+public class TodoItemView {
 public class TodoApp {
 
     private static TodoApp INSTANCE = null;
+    private JFrame window = null;
 
-    TodoApp() {
+    public TodoApp(String title) {
         if (INSTANCE != null) {
             throw new IllegalStateException("Who instantiate me twice?");
         }
@@ -14,15 +18,18 @@ public class TodoApp {
         try {
             String howDoILook = UIManager.getSystemLookAndFeelClassName();
             UIManager.setLookAndFeel(howDoILook);
-            System.out.println("Look and feel: " + howDoILook);
         }
         catch(Exception e) {
             e.printStackTrace();
         }
-    }
 
-    // repeat after me: public static final void main string args
-    public static void main(String[] args) {
-        new TodoApp();
+        // initialize window
+        this.window = new JFrame(title);
+
+        this.window.setSize(400, 400);
+        this.window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.window.setVisible(true);
     }
+}
+
 }
