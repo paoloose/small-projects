@@ -4,7 +4,7 @@ set -e
 
 group_id="com.github.paoloose"
 artifact_id="todoapp"
-main_class="main.TodoApp"
+main_class="main.Main"
 app_name="todoapp" # jar output name
 
 src_prefix="src/main/java"
@@ -26,7 +26,7 @@ function usage() {
     echo "  clean: remove the target directory"
 }
 
-function create_manifest() {
+function generate_manifest() {
     local destination="$1"
     local manifest=''
     manifest+="Manifest-Version: 1.0\n"
@@ -62,19 +62,8 @@ function build_app() {
 
     cp -r "src/main/resources" "$classes_outdir" 2> /dev/null || :
 
-    pushd $classes_outdir
-        local class_objects=$(find . -name '*.class')
-    popd
-
-    echo
-    echo $class_objects | tr " " "\n"
-    echo
-    echo $classes_outdir
-    echo $(pwd)
-    echo
-
-    create_manifest "$outdir/MANIFEST.MF"
-    jar --create -v --file"=$outdir/$app_name.jar" --manifest="$outdir/MANIFEST.MF" -C "$classes_outdir" $class_objects
+    generate_manifest "$outdir/MANIFEST.MF"
+    jar --create -v --file"=$outdir/$app_name.jar" --manifest="$outdir/MANIFEST.MF" -C "$classes_outdir" .
 }
 
 function run_app() {
