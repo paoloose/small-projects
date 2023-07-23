@@ -1,18 +1,20 @@
 #!/usr/bin/bash
 
+set -e
+
 group_id="com.github.paoloose"
 artifact_id="todoapp"
-main_class="TodoApp"
+main_class="main.TodoApp"
 app_name="todoapp" # jar output name
 
 src_prefix="src/main/java"
 test_prefix="src/test/java"
-output="target"
+outdir="target"
 
 # replace the syntax <tld>.<domain>.<artifact> to <tld>/<domain>/<artifact>
 #   where <tld>: top level domain
 #   see: https://maven.apache.org/guides/mini/guide-naming-conventions.html
-project_dir=$(echo "$group_id.$artifact_id" | tr . /)
+project_dir=$(echo "$group_id.$artifact_id" | tr "." "/")
 
 function usage() {
     echo "usage: $0 <command>"
@@ -47,10 +49,10 @@ function build_app() {
         exit 1
     fi
 
-    local output_classes=$output/classes
-    mkdir -p "$output_classes"
+    local classes_outdir=$outdir/classes
+    mkdir -p "$classes_outdir"
 
-    compilation_output=$(javac -d "$output_classes" $java_classes 2>&1)
+    local compilation_output=$(javac -d "$classes_outdir" $java_classes 2>&1)
 
     if [ -n "$compilation_output" ]; then
         echo -e "Compilation failed! 😢\n" 1>&2
@@ -58,26 +60,33 @@ function build_app() {
         exit 1
     fi
 
-    cp -r "src/main/resources" "$output_classes" 2> /dev/null || :
+    cp -r "src/main/resources" "$classes_outdir" 2> /dev/null || :
 
-    pushd $output_classes
-        class_objects=$(find . -name '*.class')
+    pushd $classes_outdir
+        local class_objects=$(find . -name '*.class')
     popd
 
-    create_manifest "$output/MANIFEST.MF"
-    jar --create -v --file=$output/$app_name.jar --manifest=$output/MANIFEST.MF -C $output_classes $class_objects
+    echo
+    echo $class_objects | tr " " "\n"
+    echo
+    echo $classes_outdir
+    echo $(pwd)
+    echo
+
+    create_manifest "$outdir/MANIFEST.MF"
+    jar --create -v --file"=$outdir/$app_name.jar" --manifest="$outdir/MANIFEST.MF" -C "$classes_outdir" $class_objects
 }
 
 function run_app() {
     build_app > /dev/null
-    java -jar "$output/$app_name.jar"
+    java -jar "$outdir/$app_name.jar"
 }
 
 function clean_app() {
     # the french way
-    if [ -d "$output" ]; then
+    if [ -d "$outdir" ]; then
         echo "Removing target directory... 🐢"
-        rm -fr "$output"
+        rm -fr "$outdir"
     else
         echo "Nothing to clean, you are good to go! 🐢"
     fi
