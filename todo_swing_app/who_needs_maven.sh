@@ -20,7 +20,7 @@ function usage() {
     echo "usage: $0 <command>"
     echo
     echo "commands:"
-    echo "  run: run the application"
+    echo "  run [-- <args>]: runs the jar application"
     echo "  test: equivalent to 'echo \"All tests passed!\"'"
     echo "  package: creates a jar file"
     echo "  clean: remove the target directory"
@@ -68,7 +68,7 @@ function build_app() {
 
 function run_app() {
     build_app > /dev/null
-    java -jar "$outdir/$app_name.jar"
+    java -jar "$outdir/$app_name.jar" $@
 }
 
 function clean_app() {
@@ -82,12 +82,20 @@ function clean_app() {
 }
 
 main() {
-    local script_command="$1"
+    local script_command="$1"; shift
+    local jar_arguments=""
 
     if [ -z "$script_command" ]; then usage; exit 0; fi
 
+    for arg in $@; do
+        case "$arg" in
+            --) shift; jar_arguments="$@"; break;;
+            *) shift;;
+        esac
+    done
+
     case "$script_command" in
-        run) run_app;;
+        run) run_app $jar_arguments;;
         test) echo "All tests passed!";;
         package) build_app;;
         clean) clean_app;;

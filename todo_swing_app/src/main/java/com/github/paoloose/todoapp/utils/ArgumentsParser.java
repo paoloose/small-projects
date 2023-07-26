@@ -19,7 +19,7 @@ public class ArgumentsParser {
         ExecutionMode mode = ExecutionMode.GUI;
 
         for (String arg : args) {
-            if (arg == "--cli") {
+            if (arg.equals("--cli")) {
                 mode = ExecutionMode.CLI;
             }
         }

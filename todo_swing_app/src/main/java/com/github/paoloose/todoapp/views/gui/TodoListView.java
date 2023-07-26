@@ -1,5 +1,7 @@
 package com.github.paoloose.todoapp.views.gui;
 
-public class TodoListView {
+import javax.swing.JPanel;
 
+public class TodoListView extends JPanel {
+    boolean loaded = false;
 }
