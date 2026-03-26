@@ -65,7 +65,7 @@ verif f a b = f a == b
 {-
 Type-Kwon-Do
 
-Exercise 4.
+Exercise 5.
     calc :: Num b
         => (a -> b)
         -> b
